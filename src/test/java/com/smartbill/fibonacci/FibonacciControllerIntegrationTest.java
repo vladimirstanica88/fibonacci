@@ -1,5 +1,7 @@
 package com.smartbill.fibonacci;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.smartbill.fibonacci.config.JwtProperties;
 import com.smartbill.fibonacci.service.FibonacciService;
 import com.smartbill.fibonacci.storage.ClientStorage;
@@ -10,6 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -47,7 +51,7 @@ class FibonacciControllerIntegrationTest {
         mockMvc.perform(post("/fibonacci/next")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
-                .andExpect(content().string("1")); // primul element
+                .andExpect(content().string("1"));
     }
 
     @Test
@@ -75,9 +79,21 @@ class FibonacciControllerIntegrationTest {
 
     @Test
     void generateToken_ShouldReturnValidToken() throws Exception {
-        mockMvc.perform(get("/fibonacci/token")
+        String token = mockMvc.perform(get("/fibonacci/token")
                         .param("clientId", "another-client"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.notNullValue()));
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertNotNull(token);
+
+        DecodedJWT decoded = JWT.decode(token);
+
+        assertEquals("HS256", decoded.getAlgorithm());
+        assertEquals("another-client", decoded.getClaim("clientId").asString());
+        assertNotNull(decoded.getIssuedAt());
+        assertNotNull(decoded.getId()); // jti
     }
+
 }
