@@ -9,4 +9,6 @@ public interface ClientStorage {
     ClientState getOrCreate(String clientId);
 
     void save(String clientId, ClientState state);
+
+    void clear();
 }

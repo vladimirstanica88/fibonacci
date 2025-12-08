@@ -25,4 +25,9 @@ public class ConcurrentClientStorage implements ClientStorage {
     public void save(String clientId, ClientState state) {
         states.put(clientId, state);
     }
+
+    @Override
+    public void clear() {
+        states.clear();
+    }
 }
