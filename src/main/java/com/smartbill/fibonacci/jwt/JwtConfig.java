@@ -9,10 +9,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class JwtConfig {
 
+    private static final String JWT_SECRET_CANNOT_BE_NULL_MESSAGE = "JWT secret cannot be null";
+
     @Bean
     public Algorithm jwtAlgorithm(JwtProperties jwtProperties) {
         if (jwtProperties.getSecret() == null) {
-            throw new InvalidJwtException("JWT secret cannot be null");
+            throw new InvalidJwtException(JWT_SECRET_CANNOT_BE_NULL_MESSAGE);
         }
         return Algorithm.HMAC256(jwtProperties.getSecret());
     }

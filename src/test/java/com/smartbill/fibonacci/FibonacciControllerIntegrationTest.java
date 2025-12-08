@@ -8,8 +8,8 @@ import com.smartbill.fibonacci.storage.ClientStorage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -52,6 +52,58 @@ class FibonacciControllerIntegrationTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(content().string("1"));
+
+        mockMvc.perform(post("/fibonacci/next")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(content().string("1"));
+
+        mockMvc.perform(post("/fibonacci/next")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(content().string("2"));
+
+        mockMvc.perform(post("/fibonacci/next")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(content().string("3"));
+
+        mockMvc.perform(post("/fibonacci/next")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(content().string("5"));
+    }
+
+    @Test
+    void prev_ShouldReturnToPreviousFibonacciNumber() throws Exception {
+        mockMvc.perform(post("/fibonacci/next")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(content().string("1"));
+
+        mockMvc.perform(post("/fibonacci/next")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(content().string("1"));
+
+        mockMvc.perform(post("/fibonacci/next")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(content().string("2"));
+
+        mockMvc.perform(post("/fibonacci/next")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(content().string("3"));
+
+        mockMvc.perform(post("/fibonacci/prev")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/fibonacci")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(content().json("[1,1,2]"));
     }
 
     @Test
@@ -71,10 +123,14 @@ class FibonacciControllerIntegrationTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
 
+        mockMvc.perform(post("/fibonacci/next")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+
         mockMvc.perform(get("/fibonacci")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
-                .andExpect(content().json("[1,1]"));
+                .andExpect(content().json("[1,1,2]"));
     }
 
     @Test
@@ -93,7 +149,7 @@ class FibonacciControllerIntegrationTest {
         assertEquals("HS256", decoded.getAlgorithm());
         assertEquals("another-client", decoded.getClaim("clientId").asString());
         assertNotNull(decoded.getIssuedAt());
-        assertNotNull(decoded.getId()); // jti
+        assertNotNull(decoded.getId());
     }
 
 }
