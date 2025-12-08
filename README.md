@@ -6,7 +6,7 @@ API for managing Fibonacci sequences per client, with JWT authentication.
 ``` shell
 
 docker build -t fibonacci-app .
-docker run -p 8080:8080 -e JWT_SECRET=my-little-secret fibonacci-app
+docker run -p 8080:8080 fibonacci-app
 
 ```
 
