@@ -2,7 +2,6 @@ package jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.smartbill.fibonacci.exception.InvalidJwtException;
 import com.smartbill.fibonacci.jwt.JwtServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,21 +53,21 @@ class JwtServiceImplTest {
     }
 
     @Test
-    void extractClientId_ShouldThrow_WhenHeaderIsNull() {
+    void extractClientId_ShouldThrowInvalidJwtException_WhenHeaderIsNull() {
         InvalidJwtException ex = assertThrows(InvalidJwtException.class,
                 () -> jwtService.extractClientId(null));
         assertEquals("Missing or invalid Authorization header", ex.getMessage());
     }
 
     @Test
-    void extractClientId_ShouldThrow_WhenHeaderDoesNotStartWithBearer() {
+    void extractClientId_ShouldThrowInvalidJwtException_WhenHeaderDoesNotStartWithBearer() {
         InvalidJwtException ex = assertThrows(InvalidJwtException.class,
                 () -> jwtService.extractClientId("InvalidHeader"));
         assertEquals("Missing or invalid Authorization header", ex.getMessage());
     }
 
     @Test
-    void extractClientId_ShouldThrow_WhenClientIdClaimIsMissing() {
+    void extractClientId_ShouldThrowInvalidJwtException_WhenClientIdClaimIsMissing() {
         String tokenWithoutClaim = JWT.create()
                 .withJWTId(java.util.UUID.randomUUID().toString())
                 .sign(algorithm);
@@ -81,23 +80,21 @@ class JwtServiceImplTest {
     }
 
     @Test
-    void extractClientId_ShouldThrow_WhenTokenIsTampered() {
+    void extractClientId_ShouldThrowInvalidJwtException_WhenTokenIsTampered() {
         String token = jwtService.generateToken("client1");
         String tampered = token.substring(0, token.length() - 1) + "x";
         String authHeader = "Bearer " + tampered;
 
-        assertThrows(SignatureVerificationException.class, () ->
-                jwtService.extractClientId(authHeader));
+        assertThrows(InvalidJwtException.class, () -> jwtService.extractClientId(authHeader));
     }
 
     @Test
-    void extractClientId_ShouldThrow_WhenSignedWithWrongSecret() {
+    void extractClientId_ShouldThrowInvalidJwtException_WhenSignedWithWrongSecret() {
         Algorithm wrongAlg = Algorithm.HMAC256("wrong-secret");
         String token = JWT.create().withClaim("clientId", "client1").sign(wrongAlg);
         String authHeader = "Bearer " + token;
 
-        assertThrows(SignatureVerificationException.class, () ->
-                jwtService.extractClientId(authHeader));
+        assertThrows(InvalidJwtException.class, () -> jwtService.extractClientId(authHeader));
     }
 
 }

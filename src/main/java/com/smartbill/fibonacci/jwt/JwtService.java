@@ -1,10 +1,6 @@
 package com.smartbill.fibonacci.jwt;
 
-/**
- * Service interface for handling JSON Web Tokens (JWT) operations.
- * Provides methods for extracting client information from a token
- * and generating new JWT tokens.
- */
+
 public interface JwtService {
 
     /**

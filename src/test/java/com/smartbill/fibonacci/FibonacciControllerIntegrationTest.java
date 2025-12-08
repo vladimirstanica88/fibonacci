@@ -110,7 +110,7 @@ class FibonacciControllerIntegrationTest {
     void prev_ShouldReturnBadRequestWhenNoPrevious() throws Exception {
         mockMvc.perform(post("/fibonacci/prev")
                         .header("Authorization", "Bearer " + token))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test

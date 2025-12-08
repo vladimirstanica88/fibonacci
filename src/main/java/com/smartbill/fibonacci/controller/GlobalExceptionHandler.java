@@ -3,13 +3,14 @@ package com.smartbill.fibonacci.controller;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.smartbill.fibonacci.exception.InvalidJwtException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.Instant;
 import java.util.Map;
+
+import static org.springframework.http.HttpStatus.*;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -20,7 +21,7 @@ public class GlobalExceptionHandler {
                 "timestamp", Instant.now(),
                 "message", ex.getMessage()
         );
-        return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(body, UNAUTHORIZED);
     }
 
     @ExceptionHandler(JWTVerificationException.class)
@@ -29,7 +30,7 @@ public class GlobalExceptionHandler {
                 "timestamp", Instant.now(),
                 "message", ex.getMessage()
         );
-        return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(body, UNAUTHORIZED);
     }
 
     @ExceptionHandler(SignatureVerificationException.class)
@@ -38,7 +39,16 @@ public class GlobalExceptionHandler {
                 "timestamp", Instant.now(),
                 "message", ex.getMessage()
         );
-        return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(body, UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalStateException(IllegalStateException ex) {
+        Map<String, Object> body = Map.of(
+                "timestamp", Instant.now(),
+                "message", ex.getMessage()
+        );
+        return new ResponseEntity<>(body, BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
@@ -47,6 +57,6 @@ public class GlobalExceptionHandler {
                 "timestamp", Instant.now(),
                 "message", ex.getMessage()
         );
-        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(body, INTERNAL_SERVER_ERROR);
     }
 }
