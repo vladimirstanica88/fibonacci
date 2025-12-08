@@ -5,7 +5,6 @@ import com.smartbill.fibonacci.storage.ClientStorage;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class FibonacciServiceImpl implements FibonacciService {
@@ -17,7 +16,7 @@ public class FibonacciServiceImpl implements FibonacciService {
     }
 
     @Override
-    public Map<String, Object> next(String clientId) {
+    public Long next(String clientId) {
         ClientState state = storage.getOrCreate(clientId);
         long nextValue;
         int pos = state.getPosition();
@@ -33,11 +32,11 @@ public class FibonacciServiceImpl implements FibonacciService {
         state.setPosition(state.getPosition() + 1);
         storage.save(clientId, state);
 
-        return Map.of("position", state.getPosition(), "value", nextValue);
+        return nextValue;
     }
 
     @Override
-    public Map<String, String> prev(String clientId) {
+    public void prev(String clientId) {
         ClientState state = storage.get(clientId);
         if (state == null || state.getPosition() <= 1) {
             throw new IllegalStateException("Cannot go back");
@@ -47,13 +46,14 @@ public class FibonacciServiceImpl implements FibonacciService {
         state.setPosition(state.getPosition() - 1);
         storage.save(clientId, state);
 
-        return Map.of("status", "OK");
     }
 
     @Override
-    public Map<String, List<Long>> list(String clientId) {
+    public List<Long> list(String clientId) {
         ClientState state = storage.get(clientId);
-        if (state == null) return Map.of("values", List.of());
-        return Map.of("values", state.getValues());
+        if (state == null) {
+            return List.of();
+        }
+        return state.getValues();
     }
 }

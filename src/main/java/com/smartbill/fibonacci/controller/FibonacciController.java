@@ -6,8 +6,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/fib")
+@RequestMapping("/fibonacci")
 @AllArgsConstructor
 public class FibonacciController {
 
@@ -18,19 +20,22 @@ public class FibonacciController {
     @PostMapping("/next")
     public ResponseEntity<?> next(@RequestHeader("Authorization") String authHeader) {
         String clientId = jwtService.extractClientId(authHeader);
-        return ResponseEntity.ok(fibonacciService.next(clientId));
+        Long next = fibonacciService.next(clientId);
+        return ResponseEntity.ok(next);
     }
 
     @PostMapping("/prev")
     public ResponseEntity<?> prev(@RequestHeader("Authorization") String authHeader) {
         String clientId = jwtService.extractClientId(authHeader);
-        return ResponseEntity.ok(fibonacciService.prev(clientId));
+        fibonacciService.prev(clientId);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping
     public ResponseEntity<?> list(@RequestHeader("Authorization") String authHeader) {
         String clientId = jwtService.extractClientId(authHeader);
-        return ResponseEntity.ok(fibonacciService.list(clientId));
+        List<Long> numbers = fibonacciService.list(clientId);
+        return ResponseEntity.ok(numbers);
     }
 
     @GetMapping("/token")
