@@ -12,7 +12,6 @@ docker run -p 8080:8080 fibonacci-app
 
 **<ins>The application should now be available on your localhost</ins>** http://localhost:8080/fibonacci
 
-**SWAGGER Documentation available** : http://localhost:8080/swagger-ui/index.html#
 
 1. Generate JWT Token :  **GET /token?clientId=test-client**
 2. Next Fibonacci Number Endpoint : **POST /next
