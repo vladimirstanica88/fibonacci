@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fibonacci Generator</title>
+    <style>
+        /* Reset simplu */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ece9e6, #ffffff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 2rem 3rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 320px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            color: #333;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        button {
+            padding: 0.6rem 1.4rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        button#prevBtn {
+            background-color: #ff7f50;
+        }
+
+        button#nextBtn {
+            background-color: #4caf50;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+            opacity: 0.9;
+        }
+
+        .fibonacci-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #555;
+            background: #f0f0f0;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+        }
+
+        .footer {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Fibonacci Generator</h1>
+    <div class="buttons">
+        <button id="prevBtn">Prev</button>
+        <button id="nextBtn">Next</button>
+    </div>
+    <div class="fibonacci-display" id="fibonacciValue">0</div>
+    <div class="footer">Automatic JWT token session</div>
+</div>
+
+<script>
+    const API_BASE = "http://localhost:8080/fibonacci";
+    let jwtToken = null;
+    let clientId = localStorage.getItem("clientId") || `client-${Math.floor(Math.random() * 1e6)}`;
+    localStorage.setItem("clientId", clientId);
+
+    async function fetchToken() {
+        const res = await fetch(`${API_BASE}/token?clientId=${clientId}`);
+        if (!res.ok) throw new Error("Failed to fetch token");
+        jwtToken = await res.text();
+    }
+
+    async function callEndpoint(endpoint) {
+        if (!jwtToken) await fetchToken();
+
+        const res = await fetch(`${API_BASE}/${endpoint}`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${jwtToken}`,
+                "Content-Type": "application/json"
+            }
+        });
+
+        if (res.status === 401 || res.status === 403) {
+            await fetchToken();
+            return callEndpoint(endpoint);
+        }
+
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({ message: res.statusText }));
+            alert("Error: " + err.message);
+            return null;
+        }
+
+        return await res.text();
+    }
+
+    async function updateDisplay() {
+        if (!jwtToken) await fetchToken();
+        const listRes = await fetch(`${API_BASE}`, { headers: { "Authorization": `Bearer ${jwtToken}` } });
+        if (listRes.ok) {
+            const numbers = await listRes.json();
+            document.getElementById("fibonacciValue").innerText = numbers.length > 0 ? numbers[numbers.length - 1] : 0;
+        }
+    }
+
+    document.getElementById("nextBtn").addEventListener("click", async () => {
+        await callEndpoint("next");
+        await updateDisplay();
+    });
+
+    document.getElementById("prevBtn").addEventListener("click", async () => {
+        await callEndpoint("prev");
+        await updateDisplay();
+    });
+
+    // Load initial value
+    (async () => { await updateDisplay(); })();
+</script>
+</body>
+</html>
