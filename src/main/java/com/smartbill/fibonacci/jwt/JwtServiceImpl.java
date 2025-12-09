@@ -54,16 +54,18 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public String generateToken(String clientId) {
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + 3600_000); // 1 hour
+
         log.info("Generating JWT token for clientId={}", clientId);
 
-        String token = JWT.create()
+        return JWT.create()
                 .withClaim(CLIENT_ID, clientId)
-                .withIssuedAt(new Date())
+                .withIssuedAt(now)
+                .withExpiresAt(expiry)
                 .withJWTId(java.util.UUID.randomUUID().toString())
                 .sign(algorithm);
-
-        log.debug("Generated token={}", token);
-        return token;
     }
+
 }
 

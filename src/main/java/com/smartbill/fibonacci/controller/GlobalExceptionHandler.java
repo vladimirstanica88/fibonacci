@@ -2,7 +2,9 @@ package com.smartbill.fibonacci.controller;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.smartbill.fibonacci.exception.InvalidJwtException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -41,6 +43,13 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(body, UNAUTHORIZED);
     }
+
+    @ExceptionHandler(TokenExpiredException.class)
+    public ResponseEntity<?> handleExpired(TokenExpiredException ex) {
+        return ResponseEntity.status(UNAUTHORIZED)
+                .body("Token expired");
+    }
+
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalStateException(IllegalStateException ex) {

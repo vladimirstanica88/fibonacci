@@ -26,7 +26,3 @@ docker run -p 8080:8080 fibonacci-app
 
 There are integration tests that assert the endpoints functionality.
    However, if you feel lucky today, then please give it a try.
-
-
-
-
