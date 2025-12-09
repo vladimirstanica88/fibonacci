@@ -4,39 +4,27 @@
     <meta charset="UTF-8">
     <title>Fibonacci Generator</title>
     <style>
-        /* Reset simplu */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #ece9e6, #ffffff);
+            font-family: 'Segoe UI', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            background: linear-gradient(135deg, #ece9e6, #ffffff);
         }
 
         .container {
-            background: #ffffff;
-            padding: 2rem 3rem;
+            background: #fff;
+            padding: 2rem;
             border-radius: 12px;
             box-shadow: 0 8px 20px rgba(0,0,0,0.1);
             text-align: center;
-            width: 320px;
+            width: 300px;
         }
 
-        h1 {
-            font-size: 1.8rem;
-            margin-bottom: 2rem;
-            color: #333;
-        }
+        h1 { margin-bottom: 2rem; color: #333; }
 
-        .buttons {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
+        .buttons { display: flex; justify-content: center; gap: 1rem; margin-bottom: 2rem; }
 
         button {
             padding: 0.6rem 1.4rem;
@@ -44,42 +32,23 @@
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
             color: #fff;
             font-weight: bold;
         }
 
-        button#prevBtn {
-            background-color: #ff7f50;
-        }
-
-        button#nextBtn {
-            background-color: #4caf50;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-        }
-
-        button:active {
-            transform: translateY(0);
-            opacity: 0.9;
-        }
+        #prevBtn { background-color: #ff7f50; }
+        #nextBtn { background-color: #4caf50; }
 
         .fibonacci-display {
             font-size: 2.5rem;
             font-weight: bold;
-            color: #555;
             background: #f0f0f0;
             padding: 0.8rem 1rem;
             border-radius: 10px;
+            color: #555;
         }
 
-        .footer {
-            margin-top: 1.5rem;
-            font-size: 0.9rem;
-            color: #777;
-        }
+        .footer { margin-top: 1rem; font-size: 0.9rem; color: #777; }
     </style>
 </head>
 <body>
@@ -96,13 +65,26 @@
 <script>
     const API_BASE = "http://localhost:8080/fibonacci";
     let jwtToken = null;
-    let clientId = localStorage.getItem("clientId") || `client-${Math.floor(Math.random() * 1e6)}`;
-    localStorage.setItem("clientId", clientId);
+
+    function generateUUID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            const r = Math.random() * 16 | 0;
+            const v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+
+    let clientId = localStorage.getItem("clientId");
+    if (!clientId) {
+        clientId = generateUUID();
+        localStorage.setItem("clientId", clientId);
+    }
 
     async function fetchToken() {
         const res = await fetch(`${API_BASE}/token?clientId=${clientId}`);
-        if (!res.ok) throw new Error("Failed to fetch token");
+        if (!res.ok) throw new Error("Nu am putut obține tokenul");
         jwtToken = await res.text();
+        console.log("JWT token:", jwtToken);
     }
 
     async function callEndpoint(endpoint) {
@@ -123,7 +105,7 @@
 
         if (!res.ok) {
             const err = await res.json().catch(() => ({ message: res.statusText }));
-            alert("Error: " + err.message);
+            alert("Eroare: " + err.message);
             return null;
         }
 
@@ -132,10 +114,14 @@
 
     async function updateDisplay() {
         if (!jwtToken) await fetchToken();
-        const listRes = await fetch(`${API_BASE}`, { headers: { "Authorization": `Bearer ${jwtToken}` } });
-        if (listRes.ok) {
-            const numbers = await listRes.json();
-            document.getElementById("fibonacciValue").innerText = numbers.length > 0 ? numbers[numbers.length - 1] : 0;
+        const res = await fetch(`${API_BASE}`, {
+            headers: { "Authorization": `Bearer ${jwtToken}` }
+        });
+
+        if (res.ok) {
+            const numbers = await res.json();
+            const last = numbers.length > 0 ? numbers[numbers.length - 1] : 0;
+            document.getElementById("fibonacciValue").innerText = last;
         }
     }
 
@@ -149,7 +135,6 @@
         await updateDisplay();
     });
 
-    // Load initial value
     (async () => { await updateDisplay(); })();
 </script>
 </body>
