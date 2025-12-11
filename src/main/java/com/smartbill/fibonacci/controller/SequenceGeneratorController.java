@@ -1,40 +1,41 @@
 package com.smartbill.fibonacci.controller;
 
 import com.smartbill.fibonacci.jwt.JwtService;
-import com.smartbill.fibonacci.service.FibonacciService;
+import com.smartbill.fibonacci.service.SequenceGeneratorService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @RestController
 @RequestMapping("/fibonacci")
 @AllArgsConstructor
-public class FibonacciController {
+public class SequenceGeneratorController {
 
-    private final FibonacciService fibonacciService;
+    private final SequenceGeneratorService sequenceGeneratorService;
     private final JwtService jwtService;
 
 
     @PostMapping("/next")
     public ResponseEntity<?> next(@RequestHeader("Authorization") String authHeader) {
         String clientId = jwtService.extractClientId(authHeader);
-        Long next = fibonacciService.next(clientId);
+        BigInteger next = sequenceGeneratorService.next(clientId);
         return ResponseEntity.ok(next);
     }
 
-    @PostMapping("/prev")
+    @DeleteMapping("/prev")
     public ResponseEntity<?> prev(@RequestHeader("Authorization") String authHeader) {
         String clientId = jwtService.extractClientId(authHeader);
-        fibonacciService.prev(clientId);
+        sequenceGeneratorService.prev(clientId);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping
     public ResponseEntity<?> list(@RequestHeader("Authorization") String authHeader) {
         String clientId = jwtService.extractClientId(authHeader);
-        List<Long> numbers = fibonacciService.list(clientId);
+        List<BigInteger> numbers = sequenceGeneratorService.list(clientId);
         return ResponseEntity.ok(numbers);
     }
 

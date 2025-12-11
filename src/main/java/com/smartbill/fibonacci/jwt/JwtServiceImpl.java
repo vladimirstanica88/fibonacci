@@ -21,6 +21,7 @@ public class JwtServiceImpl implements JwtService {
     private static final String CLIENT_ID = "clientId";
     private static final String MISSING_OR_INVALID_CLIENT_ID_MESSAGE = "Missing or invalid clientId";
     private static final int BEGIN_INDEX = 7;
+    private static final String INVALID_TOKEN_ERROR_MESSAGE = "Invalid token";
 
     private final Algorithm algorithm;
 
@@ -39,7 +40,7 @@ public class JwtServiceImpl implements JwtService {
             decoded = JWT.require(algorithm).build().verify(token);
         } catch (Exception e) {
             log.warn("JWT verification failed: {}", e.getMessage());
-            throw new InvalidJwtException("Invalid token");
+            throw new InvalidJwtException(INVALID_TOKEN_ERROR_MESSAGE);
         }
 
         String clientId = decoded.getClaim(CLIENT_ID).asString();

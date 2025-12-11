@@ -3,7 +3,7 @@ package com.smartbill.fibonacci;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.smartbill.fibonacci.config.JwtProperties;
-import com.smartbill.fibonacci.service.FibonacciService;
+import com.smartbill.fibonacci.service.SequenceGeneratorService;
 import com.smartbill.fibonacci.storage.ClientStorage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = FibonacciApplication.class)
 @AutoConfigureMockMvc
-class FibonacciControllerIntegrationTest {
+class SequenceGeneratorControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -31,7 +31,7 @@ class FibonacciControllerIntegrationTest {
     private ClientStorage clientStorage;
 
     @Autowired
-    private FibonacciService fibonacciService;
+    private SequenceGeneratorService sequenceGeneratorService;
 
     private String token;
 

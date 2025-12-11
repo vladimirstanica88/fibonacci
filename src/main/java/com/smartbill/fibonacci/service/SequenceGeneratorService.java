@@ -1,8 +1,10 @@
 package com.smartbill.fibonacci.service;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
-public interface FibonacciService {
+public interface SequenceGeneratorService {
 
     /**
      * Computes and returns the next Fibonacci number for the specified client.
@@ -11,7 +13,7 @@ public interface FibonacciService {
      * @param clientId the ID of the client
      * @return the next Fibonacci number for the client
      */
-    Long next(String clientId);
+    BigInteger next(String clientId);
 
     /**
      * Moves the Fibonacci sequence one step back for the specified client.
@@ -28,6 +30,6 @@ public interface FibonacciService {
      * @param clientId the ID of the client
      * @return a list of Fibonacci numbers for the client; empty list if no numbers exist
      */
-    List<Long> list(String clientId);
+    List<BigInteger> list(String clientId);
 }
 
